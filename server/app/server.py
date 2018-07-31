@@ -94,3 +94,23 @@ class Server:
             body=json.dumps(message))
         self.logger.info('[reco] Publishing -- Correlation Id : %s' % corr)
         
+        scores = []
+        worker_res = None
+        while len(self.response) < self.max_workers:
+            self.connection.process_data_events()
+            time.sleep(0.01)
+       
+        for res in self.response:
+            worker_res = json.loads(res)
+            status = worker_res['status']
+        self.response = []
+        self.logger.info(status)
+        return self.result(status, [])
+    
+    def result(self, status, contents):
+        """Function that store the results in a dictionnary"""
+        result = {}
+        result['status'] = status
+        result['results'] = contents
+        return result
+
